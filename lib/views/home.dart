@@ -17,65 +17,66 @@ class Home extends StatelessWidget {
     HomeBody homeBody = Get.put(HomeBody());
     return SafeArea(
       child: Scaffold(
-        body: Container(
-            color: colorConstant.kPrimary,
-            padding: const EdgeInsets.only(bottom: 5),
-            child: Obx(() {
-              return Column(
-                children: [
-                  customAppBar.customHomeAppBar(),
-                  Expanded(
-                      child: controller.searchQuery.value != "" &&
-                              controller.pageNumber.value > 0
-                          ? FutureBuilder<List<WallpaperModel>>(
-                              future: controller.wallpaperData,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.active ||
-                                    snapshot.connectionState ==
-                                        ConnectionState.done) {
-                                  if (snapshot.hasError) {
-                                    debugPrint('Got error');
-                                    controller.loadingItems(false);
-                                    return Text(snapshot.error.toString());
+          body: Container(
+              color: colorConstant.kPrimary,
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Obx(() {
+                return Column(
+                  children: [
+                    customAppBar.customHomeAppBar(),
+                    Expanded(
+                        child: controller.searchQuery.value != "" &&
+                                controller.pageNumber.value > 0
+                            ? FutureBuilder<List<WallpaperModel>>(
+                                future: controller.wallpaperData,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.active ||
+                                      snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                    if (snapshot.hasError) {
+                                      debugPrint('Got error');
+                                      controller.loadingItems(false);
+                                      return Text(snapshot.error.toString());
+                                    } else {
+                                      debugPrint("Got data");
+                                      controller.addItemsToList(
+                                          context, snapshot.data!);
+                                      controller.loadingItems(false);
+                                      debugPrint("Finished adding data to List");
+                                      return homeBody.getHomeBody();
+                                    }
+                                  } else if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    debugPrint("Waiting for data");
+                                    if (controller.items == null) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else {
+                                      debugPrint(
+                                          "Showing Bottom Progress Indicator");
+                                      controller.loadingItems(true);
+                                      return homeBody.getHomeBody();
+                                    }
                                   } else {
-                                    debugPrint("Got data");
-                                    controller.loadingItems(false);
-                                    controller.addItemsToList(snapshot.data!);
-                                    debugPrint("Finished adding data to List");
-                                    return homeBody.getHomeBody();
+                                    debugPrint("Got nothing to show");
+                                    return Container();
                                   }
-                                } else if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  debugPrint("Waiting for data");
-                                  if (controller.items == null) {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
-                                  } else {
-                                    debugPrint(
-                                        "Showing Bottom Progress Indicator");
-                                    controller.loadingItems(true);
-                                    return homeBody.getHomeBody();
-                                  }
-                                } else {
-                                  debugPrint("Got nothing to show");
-                                  return Container();
-                                }
-                              })
-                          : Container()),
-                  Container(
-                      height: 40,
-                      width: Get.mediaQuery.size.width,
-                      color: colorConstant.kPrimary,
-                      child: TextButton(
-                          child: const Text("Load More"),
-                          onPressed: () {
-                            controller.loadMore();
-                          }))
-                ],
-              );
-            })),
-      ),
+                                })
+                            : Container()),
+                    Container(
+                        height: 40,
+                        width: Get.mediaQuery.size.width,
+                        color: colorConstant.kPrimary,
+                        child: TextButton(
+                            child: const Text("Load More"),
+                            onPressed: () {
+                              controller.loadMore();
+                            }))
+                  ],
+                );
+              })),
+        ),
     );
   }
 }
