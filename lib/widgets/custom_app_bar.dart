@@ -28,7 +28,8 @@ class CustomAppBar {
               child: Form(
                 key: formKey,
                 child: TextFormField(
-                  initialValue: controller.searchQuery.value,
+                  controller:
+                      TextEditingController(text: controller.searchQuery.value),
                   style: TextStyle(color: colorConstant.secondaryTextColor),
                   cursorColor: colorConstant.secondaryTextColor,
                   decoration: InputDecoration(
@@ -48,27 +49,18 @@ class CustomAppBar {
                     controller.saveSearchQuery(val!);
                   },
                   validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'Please enter Search Term';
-                    } else if (val.isPhoneNumber) {
-                      return 'Please enter a Search Term instead of a Phone Number';
-                    } else if (val.isEmail) {
-                      return 'Please enter a Search Term instead of an Email';
-                    } else if (val.isNumericOnly) {
-                      return 'Please enter a Search Term instead of a Number';
-                    } else {
-                      int i;
-                      int count = 0;
-                      for (i = 0; i < val.length; i++) {
-                        if (val.substring(i, i + 1) == " ") {
-                          count = count + 1;
-                        }
-                      }
-                      debugPrint(count.toString());
-                      if (count == val.length) {
-                        return 'Please enter a Search Term';
+                    int i;
+                    int count = 0;
+                    for (i = 0; i < val!.length; i++) {
+                      if (val.substring(i, i + 1) == " ") {
+                        count = count + 1;
                       }
                     }
+                    debugPrint(count.toString());
+                    if (count == val.length) {
+                      return 'Please enter something';
+                    }
+
                     return null;
                   },
                 ),

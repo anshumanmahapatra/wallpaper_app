@@ -57,7 +57,7 @@ class DraggableWidget extends StatelessWidget {
                     OutlinedButton(
                       child: const Text("Home Screen"),
                       onPressed: () {
-                         controller.setWallpaper(1, wallpaperModel.largeImgUrl);
+                        controller.setWallpaper(1, wallpaperModel.largeImgUrl);
                       },
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.blue),

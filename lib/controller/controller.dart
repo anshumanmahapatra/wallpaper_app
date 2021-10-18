@@ -75,7 +75,7 @@ class Controller extends GetxController {
   }
 
   Future<void> setWallpaper(int wallpaperType, String imgUrl) async {
-     String? msg;
+    String? msg;
     try {
       int location;
       if (wallpaperType == 1) {
