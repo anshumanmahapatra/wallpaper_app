@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wallpaper_app/views/search_view.dart';
 
 import '../controller/controller.dart';
 import '../constants/color_constant.dart';
@@ -30,38 +31,16 @@ class CustomAppBar {
                 child: TextFormField(
                   controller:
                       TextEditingController(text: controller.searchQuery.value),
+                  readOnly: true,
                   style: TextStyle(color: colorConstant.secondaryTextColor),
-                  cursorColor: colorConstant.secondaryTextColor,
                   decoration: InputDecoration(
-                    hintText: "Search",
-                    hintStyle: TextStyle(color: colorConstant.hintTextColor),
                     suffixIcon: IconButton(
                         icon: Icon(Icons.search,
                             color: colorConstant.primaryTextColor),
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            formKey.currentState!.save();
-                            controller.searchForTheTerm();
-                          }
-                        }),
+                        onPressed: () {}),
                   ),
-                  onSaved: (val) {
-                    controller.saveSearchQuery(val!);
-                  },
-                  validator: (val) {
-                    int i;
-                    int count = 0;
-                    for (i = 0; i < val!.length; i++) {
-                      if (val.substring(i, i + 1) == " ") {
-                        count = count + 1;
-                      }
-                    }
-                    debugPrint(count.toString());
-                    if (count == val.length) {
-                      return 'Please enter something';
-                    }
-
-                    return null;
+                  onTap: () {
+                    Get.to(() => const SearchView());
                   },
                 ),
               ),

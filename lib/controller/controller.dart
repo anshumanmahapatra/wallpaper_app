@@ -4,12 +4,23 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/state_manager.dart';
+import 'package:wallpaper_app/services/suggestions_api.dart';
 import '../models/wallpaper_model.dart';
+import '../models/suggestions_model.dart';
 import '../services/wallpaper_api.dart';
+import '../services/storage.dart';
 
 class Controller extends GetxController {
   @override
   void onInit() {
+    if (box.read('controller') == 0 || !box.hasData('controller')) {
+      box.write('controller', 0);
+      box.write('clearSearch', false);
+      clearSearch.value = false;
+    } else {
+      box.write('clearSearch', true);
+      clearSearch.value = true;
+    }
     getWallpaperData(searchQuery.value, pageNumber.value);
     super.onInit();
   }
@@ -17,15 +28,48 @@ class Controller extends GetxController {
   var pageNumber = 1.obs;
   var searchQuery = "Nature".obs;
   var isLoadingHomePageItems = false.obs;
+  var onChangedNumber = 0.obs;
+  var clearSearch = false.obs;
 
   List<WallpaperModel>? items;
   Future<List<WallpaperModel>>? wallpaperData;
+  Future<SuggestionsModel>? suggestionsData;
+
+  addRecentSearch(String searchTerm) {
+    for (int i1 = 0; i1 <= 10; i1++) {
+      if (box.read('controller') < 10) {
+        if (box.read('controller') == i1) {
+          box.write('${i1 + 1}', searchTerm);
+          box.write('controller', i1 + 1);
+          break;
+        }
+      } else {
+        for (int i2 = 1; i2 < 10; i2++) {
+          box.write('$i2', box.read('${i2 + 1}'));
+        }
+        box.write('10', searchTerm);
+        break;
+      }
+    }
+  }
+
+  clearRecentSearch() {
+    box.erase();
+    box.write('controller', 0);
+    box.write('clearSearch', false);
+    clearSearch.value = false;
+  }
 
   searchForTheTerm() {
     items!.clear();
     items = null;
     pageNumber.value = 1;
+    box.write('clearSearch', true);
     getWallpaperData(searchQuery.value, pageNumber.value);
+  }
+
+  setClearSearch() {
+    clearSearch.value = true;
   }
 
   loadMore() {
@@ -72,6 +116,18 @@ class Controller extends GetxController {
 
   getWallpaperData(String query, int pageNumber) {
     wallpaperData = WallpaperApi().getWallpaperForHome(query, pageNumber);
+  }
+
+  getSuggestionsData(String query) {
+    suggestionsData = SuggestionsApi().getSuggestionsApi(query);
+  }
+
+  updateOnChangedNumber() {
+    onChangedNumber.value = onChangedNumber.value + 1;
+  }
+
+  resetOnChangedNumber() {
+    onChangedNumber.value = 0;
   }
 
   Future<void> setWallpaper(int wallpaperType, String imgUrl) async {
